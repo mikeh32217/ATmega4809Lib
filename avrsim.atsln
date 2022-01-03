@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Atmel Studio Solution File, Format Version 11.00
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "avrsim", "avrsim\avrsim.cppproj", "{DCE6C7E3-EE26-4D79-826B-08594B9AD897}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FBB1E8F3-CBD2-4A7D-A687-9F2810BE547D} = {FBB1E8F3-CBD2-4A7D-A687-9F2810BE547D}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{64BE9FA5-0F4F-43F2-BA03-8C77222E93BF}"
+EndProject
+Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "CDAC", "CDAC\CDAC.cppproj", "{FBB1E8F3-CBD2-4A7D-A687-9F2810BE547D}"
+EndProject
+Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "CSpi", "CSpi\CSpi.cppproj", "{23D326E8-E062-48B7-91D7-160148078D66}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Debug|AVR.ActiveCfg = Debug|AVR
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Debug|AVR.Build.0 = Debug|AVR
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Release|AVR.ActiveCfg = Release|AVR
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Release|AVR.Build.0 = Release|AVR
+		{FBB1E8F3-CBD2-4A7D-A687-9F2810BE547D}.Debug|AVR.ActiveCfg = Debug|AVR
+		{FBB1E8F3-CBD2-4A7D-A687-9F2810BE547D}.Debug|AVR.Build.0 = Debug|AVR
+		{FBB1E8F3-CBD2-4A7D-A687-9F2810BE547D}.Release|AVR.ActiveCfg = Release|AVR
+		{FBB1E8F3-CBD2-4A7D-A687-9F2810BE547D}.Release|AVR.Build.0 = Release|AVR
+		{23D326E8-E062-48B7-91D7-160148078D66}.Debug|AVR.ActiveCfg = Debug|AVR
+		{23D326E8-E062-48B7-91D7-160148078D66}.Debug|AVR.Build.0 = Debug|AVR
+		{23D326E8-E062-48B7-91D7-160148078D66}.Release|AVR.ActiveCfg = Release|AVR
+		{23D326E8-E062-48B7-91D7-160148078D66}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FBB1E8F3-CBD2-4A7D-A687-9F2810BE547D} = {64BE9FA5-0F4F-43F2-BA03-8C77222E93BF}
+		{23D326E8-E062-48B7-91D7-160148078D66} = {64BE9FA5-0F4F-43F2-BA03-8C77222E93BF}
+	EndGlobalSection
+EndGlobal
