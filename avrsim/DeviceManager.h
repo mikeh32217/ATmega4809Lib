@@ -11,22 +11,29 @@
 
 #include "CDAC.h"
 #include "CSpi.h"
-
-#define DAC_CHANNEL			0
-#define DAC_LATCH_CHANNEL	1
+#include "CPulse.h"
 
 class DeviceManager
 {
 	private:
 		CSpi*	mp_spi;
 		CDAC*	mp_dac;
+		CPulse*	mp_pulse;
 		
 	//functions
 	public:
 		DeviceManager();
 		
 		void SetDacVoltage(float volts);
-
+		
+		void ConfigureOneShot(uint16_t width, CS_STATE state = LOW);
+		void DisableOneShot();
+		void SendPulse();
+		
+		void ConfigureRepeatPulse(uint16_t period,
+								uint16_t pwidth,
+								CS_STATE state = LOW);
+		void DisableRepeatingPulse();
 }; //DeviceManager
 
 #endif //__DEVICEMANAGER_H__

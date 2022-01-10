@@ -5,37 +5,46 @@
 * Author: Mike
 */
 #include <avr/io.h>
-#include "_cplusplus.h"
 #include "DeviceManager.h"
 
 // default constructor
 DeviceManager::DeviceManager()
 {
 	mp_spi = new CSpi;
-	mp_dac = new CDAC;
-
-	mp_spi->ConfigureChannel(DAC_CHANNEL, &PORTA, PIN7_bm);
-	mp_spi->ConfigureChannel(DAC_LATCH_CHANNEL, &PORTA, PIN3_bm);
+	mp_dac = new CDAC(mp_spi);
+	mp_pulse = new CPulse();
 }
 
 void DeviceManager::SetDacVoltage(float volts)
 {
-	uint16_t dout = mp_dac->ConvertVoltage(volts);
-	
-	mp_spi->SetPinState(DAC_CHANNEL, LOW);
-	//PORTA.OUT &= ~PIN7_bm; // Set SS pin value to LOW
-	mp_spi->TransferData((dout >> 8) | 0x70);
-	mp_spi->TransferData(dout & 0xff);
-	//SPI0_exchangeData(data >> 8);
-	//SPI0_exchangeData(data & 0xff);
-	//PORTA.OUT |= PIN7_bm; // Set SS pin value to HIGH
-	mp_spi->SetPinState(DAC_CHANNEL, HIGH);
+	mp_dac->SetVoltage(volts);
+}
 
-	mp_spi->SetPinState(DAC_LATCH_CHANNEL, LOW);
-	//PORTA.OUT |= PIN3_bm; // Toggle LATCH
-	asm volatile("NOP");
-	//PORTA.OUT &= ~PIN3_bm;
-	mp_spi->SetPinState(DAC_LATCH_CHANNEL, HIGH);
+void DeviceManager::ConfigureOneShot(uint16_t width, CS_STATE state /* = LOW */)
+{
+	mp_pulse->ConfigureOneShot(width, state);
+}
+
+void DeviceManager::ConfigureRepeatPulse(uint16_t period,
+										uint16_t pwidth,
+										CS_STATE state/* = LOW*/)
+{
+	mp_pulse->ConfigureRepeatingPulse(period, pwidth, state);
+}
+
+void DeviceManager::DisableOneShot()
+{
+	mp_pulse->DisableOneShot();
+}
+
+void DeviceManager::DisableRepeatingPulse()
+{
+	mp_pulse->DisableRepeatingPulse();
+}
+
+void DeviceManager::SendPulse()
+{
+	mp_pulse->SendPulse();
 }
 
 

@@ -9,13 +9,13 @@
 #ifndef CSPI_H_
 #define CSPI_H_
 
+#include "Common.h"
+
 #define MAX_CHANNELS	5
 
 #define NOERROR		0
 #define SPI_TIMEOUT	0x01
 
-typedef enum { LOW, HIGH } CS_STATE;
-	
 typedef struct 
 {
 	bool	m_active;

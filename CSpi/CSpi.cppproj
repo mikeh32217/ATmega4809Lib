@@ -121,8 +121,10 @@
   <avrgcccpp.compiler.directories.IncludePaths>
     <ListValues>
       <Value>%24(PackRepoDir)\Atmel\ATmega_DFP\1.7.374\include\</Value>
+      <Value>../../../libs</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
+  <avrgcccpp.compiler.optimization.level>Optimize debugging experience (-Og)</avrgcccpp.compiler.optimization.level>
   <avrgcccpp.compiler.optimization.PackStructureMembers>True</avrgcccpp.compiler.optimization.PackStructureMembers>
   <avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>
   <avrgcccpp.compiler.optimization.DebugLevel>Default (-g2)</avrgcccpp.compiler.optimization.DebugLevel>
