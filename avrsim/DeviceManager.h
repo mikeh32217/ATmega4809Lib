@@ -12,6 +12,7 @@
 #include "CDAC.h"
 #include "CSpi.h"
 #include "CPulse.h"
+#include "CUart.h"
 
 class DeviceManager
 {
@@ -19,21 +20,16 @@ class DeviceManager
 		CSpi*	mp_spi;
 		CDAC*	mp_dac;
 		CPulse*	mp_pulse;
+		CUart*	mp_mspi;
 		
 	//functions
 	public:
 		DeviceManager();
 		
-		void SetDacVoltage(float volts);
-		
-		void ConfigureOneShot(uint16_t width, CS_STATE state = LOW);
-		void DisableOneShot();
-		void SendPulse();
-		
-		void ConfigureRepeatPulse(uint16_t period,
-								uint16_t pwidth,
-								CS_STATE state = LOW);
-		void DisableRepeatingPulse();
+		CDAC* GetDAC();
+		CPulse* GetPulse();
+		CUart* GetMSpi(uint16_t buf_size = DEF_BUFFER_SZ);
+
 }; //DeviceManager
 
 #endif //__DEVICEMANAGER_H__

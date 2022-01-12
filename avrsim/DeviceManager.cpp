@@ -4,47 +4,45 @@
 * Created: 12/30/2021 5:14:26 AM
 * Author: Mike
 */
+#define F_CPU 20000000UL
+
 #include <avr/io.h>
 #include "DeviceManager.h"
 
 // default constructor
 DeviceManager::DeviceManager()
 {
-	mp_spi = new CSpi;
-	mp_dac = new CDAC(mp_spi);
-	mp_pulse = new CPulse();
+	mp_spi = nullptr;
+	mp_dac = nullptr;
+	mp_pulse = nullptr;
+	mp_mspi = nullptr;
 }
 
-void DeviceManager::SetDacVoltage(float volts)
+CDAC* DeviceManager::GetDAC()
 {
-	mp_dac->SetVoltage(volts);
+	if (mp_dac == nullptr)
+	{
+		mp_spi = new CSpi();
+		mp_dac = new CDAC(mp_spi);
+	}
+	
+	return mp_dac; 
 }
 
-void DeviceManager::ConfigureOneShot(uint16_t width, CS_STATE state /* = LOW */)
+CPulse* DeviceManager::GetPulse()
 {
-	mp_pulse->ConfigureOneShot(width, state);
+	if (mp_pulse == nullptr)
+		mp_pulse = new CPulse();
+
+	return mp_pulse; 
 }
 
-void DeviceManager::ConfigureRepeatPulse(uint16_t period,
-										uint16_t pwidth,
-										CS_STATE state/* = LOW*/)
+CUart* DeviceManager::GetMSpi(uint16_t buf_size/* = DEF_BUFFER_SZ*/)
 {
-	mp_pulse->ConfigureRepeatingPulse(period, pwidth, state);
-}
-
-void DeviceManager::DisableOneShot()
-{
-	mp_pulse->DisableOneShot();
-}
-
-void DeviceManager::DisableRepeatingPulse()
-{
-	mp_pulse->DisableRepeatingPulse();
-}
-
-void DeviceManager::SendPulse()
-{
-	mp_pulse->SendPulse();
+	if (mp_mspi == nullptr)
+		mp_mspi = new CUart(USART_BAUD_RATE(F_CPU, 9600), true, buf_size);
+		
+	return mp_mspi;
 }
 
 

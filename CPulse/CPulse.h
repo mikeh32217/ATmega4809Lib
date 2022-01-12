@@ -20,11 +20,15 @@ class CPulse
 		CPulse();
 		
 		void ConfigureOneShot(uint16_t width, CS_STATE state = LOW);
+		void ConfigureOneShot(float width, CS_STATE state = LOW);
 		void DisableOneShot();
 		void SendPulse();
 		
 		void ConfigureRepeatingPulse(uint16_t period,
 									uint16_t pwidth, 
+									CS_STATE state = LOW);
+		void ConfigureRepeatingPulse(float period,
+									float pwidth,
 									CS_STATE state = LOW);
 		void DisableRepeatingPulse();
 		

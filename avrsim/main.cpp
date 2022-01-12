@@ -11,8 +11,9 @@
 #include <util/delay.h>
 #include "DeviceManager.h"
 #include "CUart.h"
+#include "CPulse.h"
+#include "CDAC.h"
 
-#define USART0_BAUD_RATE(xtal, baud) ((float)(xtal * 64 / (16 * (float)baud)) + 0.5)
 #define DEF_BUFFER_SZ	16
 
 void TestOneShot();
@@ -20,7 +21,11 @@ void TestRepeatingPulse();
 void TestDAC();
 
 DeviceManager dmgr;
-CUart uart(USART0_BAUD_RATE(F_CPU, 9600));
+CUart uart(USART_BAUD_RATE(F_CPU, 9600), false);
+
+CPulse* pulse = nullptr;
+CDAC* dac = nullptr;
+CUart* mspi = nullptr;
 
 int main(void)
 {
@@ -34,42 +39,60 @@ int main(void)
 	// set ref for adc to avdd
 	//VREF.CTRLA |= VREF_AC0REFSEL_AVDD_gc;
 	
-	TestOneShot();
+//	TestOneShot();
 //	TestDAC();
-	TestRepeatingPulse();
+//	TestRepeatingPulse();
 	
+	//PORTC.DIRSET = PIN0_bm;	// MOSI
+	//PORTC.DIRCLR = PIN1_bm;	// MISO
+	//PORTC.DIRSET = PIN2_bm;	// Clock
+	//PORTC.DIRSET = PIN3_bm;	// Enable
+	//PORTC.OUTSET = PIN3_bm;
+    //USART1.BAUD = USART_BAUD_RATE(F_CPU, 38400);
+//
+	//USART1.CTRLC = USART_CMODE_MSPI_gc;
+	//USART1.CTRLB = USART_TXEN_bm;
+	
+	mspi = dmgr.GetMSpi();
     while (1) 
     {
+		PORTC.OUTCLR = PIN3_bm;
+		mspi->SendChar(0xa6);
+		PORTC.OUTSET = PIN3_bm;
     }
 }
 
 void TestDAC()
 {
-	dmgr.SetDacVoltage(3.25);
+	dac = dmgr.GetDAC();
+	
+	dac->SetVoltage(3.25);
 }
 
 void TestOneShot()
 {
 	uint16_t cnt = 0;
 	
+	pulse = dmgr.GetPulse();
+	
 	// width is calculated as; F_CPU / WIDTH
 	// Example; 1ms = 20000000 * .001 = 0x4e20
 	// Example; 12.8uS = 20000000 * .00000128 = 0x100
-	dmgr.ConfigureOneShot(0x0100);
+	pulse->ConfigureOneShot(.0000128f);
 	
 	while(cnt++ < 0xffff)
 	{
-		dmgr.SendPulse();
+		pulse->SendPulse();
 		_delay_us(100);
 	}
 	
-	dmgr.DisableOneShot();	
+	pulse->DisableOneShot();	
 }
 
 void TestRepeatingPulse()
 {
-	dmgr.ConfigureRepeatPulse(0x4F20, 0x100);
+	pulse->ConfigureRepeatingPulse(.001f, .0000128f);
 	_delay_ms(3000);
-	dmgr.DisableRepeatingPulse();	
+	pulse->DisableRepeatingPulse();	
 }
 
