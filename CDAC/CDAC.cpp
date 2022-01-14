@@ -8,23 +8,18 @@
 #include <avr/io.h>
 #include "CDAC.h"
 
-CDAC::CDAC(CSpi* spi)
+CDAC::CDAC(CSpi* spi, float vref)
 {
 	mp_spi = spi;
+	m_vref = vref;
 	
 	mp_spi->ConfigureChannel(DAC_CHANNEL, &PORTA, PIN7_bm);
 	mp_spi->ConfigureChannel(DAC_LATCH_CHANNEL, &PORTA, PIN3_bm);
 }
 
-uint16_t CDAC::ConvertVoltage(float volts)
-{
-	// digital value = (volts * resolution) / Vref
-	return (volts * 4096.0) / 5.0;
-}
-
 void CDAC::SetVoltage(float volts)
 {
-	uint16_t dout = ConvertVoltage(volts);
+	uint16_t dout = (volts * 4096.0f) / m_vref;
 		
 	mp_spi->SetPinState(DAC_CHANNEL, LOW);
 	mp_spi->TransferData((dout >> 8) | 0x70);

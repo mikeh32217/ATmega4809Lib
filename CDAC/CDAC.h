@@ -18,12 +18,12 @@ class CDAC
 {
 	private:
 		CSpi*	mp_spi;
+		float	m_vref;
 	
 	public:
-		CDAC(CSpi* spi);
+		CDAC(CSpi* spi, float vref);
 		
-		uint16_t ConvertVoltage(float volts);
-		void SetVoltage(float volts);	
+		void SetVoltage(float volts);
 };
 
 #endif /* CDAC_H_ */

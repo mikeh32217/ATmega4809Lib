@@ -18,12 +18,12 @@ DeviceManager::DeviceManager()
 	mp_mspi = nullptr;
 }
 
-CDAC* DeviceManager::GetDAC()
+CDAC* DeviceManager::GetDAC(float vref)
 {
 	if (mp_dac == nullptr)
 	{
 		mp_spi = new CSpi();
-		mp_dac = new CDAC(mp_spi);
+		mp_dac = new CDAC(mp_spi, vref);
 	}
 	
 	return mp_dac; 

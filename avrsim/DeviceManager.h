@@ -26,7 +26,7 @@ class DeviceManager
 	public:
 		DeviceManager();
 		
-		CDAC* GetDAC();
+		CDAC* GetDAC(float vref);
 		CPulse* GetPulse();
 		CUart* GetMSpi(uint16_t buf_size = DEF_BUFFER_SZ);
 

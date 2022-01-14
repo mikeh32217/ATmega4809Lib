@@ -13,12 +13,15 @@
 #include "CUart.h"
 #include "CPulse.h"
 #include "CDAC.h"
+#include "CADC.h"
 
 #define DEF_BUFFER_SZ	16
 
 void TestOneShot();
 void TestRepeatingPulse();
 void TestDAC();
+void TestMSI();
+void TestADC();
 
 DeviceManager dmgr;
 CUart uart(USART_BAUD_RATE(F_CPU, 9600), false);
@@ -26,6 +29,7 @@ CUart uart(USART_BAUD_RATE(F_CPU, 9600), false);
 CPulse* pulse = nullptr;
 CDAC* dac = nullptr;
 CUart* mspi = nullptr;
+CADC* adc = nullptr;
 
 int main(void)
 {
@@ -41,30 +45,45 @@ int main(void)
 	
 //	TestOneShot();
 //	TestDAC();
+	TestADC();
 //	TestRepeatingPulse();
+//	TestMSI();
 	
-	//PORTC.DIRSET = PIN0_bm;	// MOSI
-	//PORTC.DIRCLR = PIN1_bm;	// MISO
-	//PORTC.DIRSET = PIN2_bm;	// Clock
-	//PORTC.DIRSET = PIN3_bm;	// Enable
-	//PORTC.OUTSET = PIN3_bm;
-    //USART1.BAUD = USART_BAUD_RATE(F_CPU, 38400);
-//
-	//USART1.CTRLC = USART_CMODE_MSPI_gc;
-	//USART1.CTRLB = USART_TXEN_bm;
-	
-	mspi = dmgr.GetMSpi();
     while (1) 
     {
+    }
+}
+
+void TestMSI()
+{
+	mspi = dmgr.GetMSpi();
+	while (1)
+	{
 		PORTC.OUTCLR = PIN3_bm;
 		mspi->SendChar(0xa6);
 		PORTC.OUTSET = PIN3_bm;
-    }
+	}
+	
+}
+
+void TestADC()
+{
+	volatile uint16_t res = 0;
+	
+	dac = dmgr.GetDAC(5.0f);
+	adc = new CADC();
+	dac->SetVoltage(0.75f);
+
+	while(1)
+	{
+		res = adc->ReadADC();
+//		_delay_ms(100);
+	}	
 }
 
 void TestDAC()
 {
-	dac = dmgr.GetDAC();
+	dac = dmgr.GetDAC(5.0f);
 	
 	dac->SetVoltage(3.25);
 }
