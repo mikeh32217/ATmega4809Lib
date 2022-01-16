@@ -19,7 +19,7 @@ CDAC::CDAC(CSpi* spi, float vref)
 
 void CDAC::SetVoltage(float volts)
 {
-	uint16_t dout = (volts * 4096.0f) / m_vref;
+	uint16_t dout = (volts / m_vref) * 4096.0f;
 		
 	mp_spi->SetPinState(DAC_CHANNEL, LOW);
 	mp_spi->TransferData((dout >> 8) | 0x70);

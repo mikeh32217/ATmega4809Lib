@@ -153,6 +153,8 @@
       <Value>../../../libs/CUart</Value>
       <Value>../../CPulse</Value>
       <Value>../../CADC</Value>
+      <Value>../../CMCP23S17</Value>
+      <Value>../../CTimer</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.level>Optimize debugging experience (-Og)</avrgcccpp.compiler.optimization.level>
@@ -169,6 +171,8 @@
       <Value>CUart</Value>
       <Value>CPulse</Value>
       <Value>CADC</Value>
+      <Value>CMCP23S17</Value>
+      <Value>CTimer</Value>
     </ListValues>
   </avrgcccpp.linker.libraries.Libraries>
   <avrgcccpp.linker.libraries.LibrarySearchPaths>
@@ -178,6 +182,8 @@
       <Value>../../../libs/CUart/debug</Value>
       <Value>../../CPulse/debug</Value>
       <Value>../../CADC/debug</Value>
+      <Value>../../CMCP23S17/debug</Value>
+      <Value>../../CTimer/debug</Value>
     </ListValues>
   </avrgcccpp.linker.libraries.LibrarySearchPaths>
   <avrgcccpp.assembler.general.IncludePaths>

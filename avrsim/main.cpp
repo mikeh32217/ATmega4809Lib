@@ -14,6 +14,8 @@
 #include "CPulse.h"
 #include "CDAC.h"
 #include "CADC.h"
+#include "CMCP23S17.h"
+#include "CTimer.h"
 
 #define DEF_BUFFER_SZ	16
 
@@ -25,6 +27,7 @@ void TestADC();
 
 DeviceManager dmgr;
 CUart uart(USART_BAUD_RATE(F_CPU, 9600), false);
+CTimer timer;
 
 CPulse* pulse = nullptr;
 CDAC* dac = nullptr;
@@ -38,6 +41,8 @@ int main(void)
 	CCP = CCP_IOREG_gc;     // Key from table 10-1 section 10.3.5
 	CLKCTRL.MCLKCTRLB = 0;  // Main Clock Control B register section 10.5.2
 		
+	timer.StartTimer();
+	
 	uart.SendData(buf, strlen(buf));
 
 	// set ref for adc to avdd
@@ -45,12 +50,16 @@ int main(void)
 	
 //	TestOneShot();
 //	TestDAC();
-	TestADC();
+//	TestADC();
 //	TestRepeatingPulse();
 //	TestMSI();
 	
+	volatile uint32_t t = 0;
     while (1) 
     {
+		t = timer.GetTicks();
+		_delay_ms(3000);
+		timer.StopTimer();
     }
 }
 
@@ -72,7 +81,7 @@ void TestADC()
 	
 	dac = dmgr.GetDAC(5.0f);
 	adc = new CADC();
-	dac->SetVoltage(0.75f);
+	dac->SetVoltage(3.75f);
 
 	while(1)
 	{

@@ -13,6 +13,7 @@
 #include "CSpi.h"
 #include "CPulse.h"
 #include "CUart.h"
+#include "CMCP23S17.h"
 
 class DeviceManager
 {
@@ -21,6 +22,7 @@ class DeviceManager
 		CDAC*	mp_dac;
 		CPulse*	mp_pulse;
 		CUart*	mp_mspi;
+		CMCP23S17* mp_pio;
 		
 	//functions
 	public:
@@ -29,6 +31,10 @@ class DeviceManager
 		CDAC* GetDAC(float vref);
 		CPulse* GetPulse();
 		CUart* GetMSpi(uint16_t buf_size = DEF_BUFFER_SZ);
+		CMCP23S17*GetPIO(uint8_t addr, uint8_t chan);
+		
+	private:
+		CSpi* GetSpi();
 
 }; //DeviceManager
 

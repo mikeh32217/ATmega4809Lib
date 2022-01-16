@@ -22,7 +22,7 @@ CDAC* DeviceManager::GetDAC(float vref)
 {
 	if (mp_dac == nullptr)
 	{
-		mp_spi = new CSpi();
+		mp_spi = GetSpi();
 		mp_dac = new CDAC(mp_spi, vref);
 	}
 	
@@ -45,4 +45,22 @@ CUart* DeviceManager::GetMSpi(uint16_t buf_size/* = DEF_BUFFER_SZ*/)
 	return mp_mspi;
 }
 
+CMCP23S17*DeviceManager::GetPIO(uint8_t addr, uint8_t chan)
+{
+	if(mp_pio == nullptr)
+	{
+		mp_spi = GetSpi();
+		mp_pio = new CMCP23S17(addr,chan, mp_spi);
+	}
+	
+	return mp_pio;
+}
+
+CSpi* DeviceManager::GetSpi()
+{
+	if(mp_spi== nullptr)
+	mp_spi = new CSpi();
+	
+	return mp_spi;
+}
 
