@@ -7,6 +7,7 @@
 #define F_CPU 20000000UL
 
 #include <avr/io.h>
+#include "ErrorCodes.h"
 #include "DeviceManager.h"
 
 // default constructor
@@ -16,6 +17,7 @@ DeviceManager::DeviceManager()
 	mp_dac = nullptr;
 	mp_pulse = nullptr;
 	mp_mspi = nullptr;
+	mp_timer = nullptr;
 }
 
 CDAC* DeviceManager::GetDAC(float vref)
@@ -27,6 +29,14 @@ CDAC* DeviceManager::GetDAC(float vref)
 	}
 	
 	return mp_dac; 
+}
+
+CADC* DeviceManager::GetADC()
+{
+	if (mp_adc == nullptr)
+		mp_adc = new CADC();
+	
+	return mp_adc;	
 }
 
 CPulse* DeviceManager::GetPulse()
@@ -45,12 +55,13 @@ CUart* DeviceManager::GetMSpi(uint16_t buf_size/* = DEF_BUFFER_SZ*/)
 	return mp_mspi;
 }
 
-CMCP23S17*DeviceManager::GetPIO(uint8_t addr, uint8_t chan)
+CMCP23S17*DeviceManager::GetPIO()
 {
 	if(mp_pio == nullptr)
 	{
 		mp_spi = GetSpi();
-		mp_pio = new CMCP23S17(addr,chan, mp_spi);
+		mp_spi->ConfigureChannel(PIO_CHANNEL, &PORTA, PIN1_bm);
+		mp_pio = new CMCP23S17(PIO_ADDRESS, PIO_CHANNEL, mp_spi);
 	}
 	
 	return mp_pio;
@@ -59,8 +70,16 @@ CMCP23S17*DeviceManager::GetPIO(uint8_t addr, uint8_t chan)
 CSpi* DeviceManager::GetSpi()
 {
 	if(mp_spi== nullptr)
-	mp_spi = new CSpi();
+		mp_spi = new CSpi();
 	
 	return mp_spi;
+}
+
+CTimer* DeviceManager::GetTimer()
+{
+	if(mp_timer == nullptr)
+		mp_timer = new CTimer();
+	
+	return mp_timer;
 }
 

@@ -19,22 +19,14 @@ class CPulse
 	public:	
 		CPulse();
 		
-		void ConfigureOneShot(uint16_t width, CS_STATE state = LOW);
+		// TODO Add unit to all floats, example 1.82 MS
 		void ConfigureOneShot(float width, CS_STATE state = LOW);
 		void DisableOneShot();
+		
 		void SendPulse();
 		
-		void ConfigureRepeatingPulse(uint16_t period,
-									uint16_t pwidth, 
-									CS_STATE state = LOW);
-		void ConfigureRepeatingPulse(float period,
-									float pwidth,
-									CS_STATE state = LOW);
-		void DisableRepeatingPulse();
-		
 	private:
-		void ConfigureTimerA(uint16_t period);
-		void ConfigureTimerB(uint16_t pwidth, CS_STATE state = LOW );
+		void ConfigureOneShot(uint16_t width, CS_STATE state = LOW);
 };
 
 

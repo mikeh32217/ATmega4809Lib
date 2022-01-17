@@ -15,16 +15,11 @@ ISR(TCA0_OVF_vect)
 {
 	g_count += 1;
 	
-	PORTE.OUTTGL = PIN1_bm;
-	
 	TCA0.SINGLE.INTFLAGS = TCA_SINGLE_OVF_bm;
 }
 
 CTimer::CTimer()
 {
-	// TEST
-	PORTE.DIRSET = PIN1_bm;
-	
 	m_callback = nullptr;
 	m_target = 0xffffffff;
 	

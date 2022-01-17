@@ -121,6 +121,7 @@
   <avrgcccpp.compiler.directories.IncludePaths>
     <ListValues>
       <Value>%24(PackRepoDir)\Atmel\ATmega_DFP\1.7.374\include\</Value>
+      <Value>../..</Value>
       <Value>../../CSpi</Value>
       <Value>K:\Projects - Robotics\Atmel Studio 7 Projects\Projects-ATmega4809\libs</Value>
     </ListValues>

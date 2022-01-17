@@ -148,6 +148,7 @@
     <ListValues>
       <Value>%24(PackRepoDir)\Atmel\ATmega_DFP\1.7.374\include\</Value>
       <Value>../../CDAC</Value>
+      <Value>../..</Value>
       <Value>../../../libs</Value>
       <Value>../../CSpi</Value>
       <Value>../../../libs/CUart</Value>

@@ -6,6 +6,7 @@
  */ 
 
 #include <avr/io.h>
+#include "ErrorCodes.h"
 #include "CDAC.h"
 
 CDAC::CDAC(CSpi* spi, float vref)
@@ -26,6 +27,18 @@ void CDAC::SetVoltage(float volts)
 	mp_spi->TransferData(dout & 0xff);
 	mp_spi->SetPinState(DAC_CHANNEL, HIGH);
 
+	mp_spi->SetPinState(DAC_LATCH_CHANNEL, LOW);
+	asm volatile("NOP");
+	mp_spi->SetPinState(DAC_LATCH_CHANNEL, HIGH);
+}
+
+void CDAC::Shutdown()
+{
+	mp_spi->SetPinState(DAC_CHANNEL, LOW);
+	mp_spi->TransferData(0x0);
+	mp_spi->TransferData(0x0);
+	mp_spi->SetPinState(DAC_CHANNEL, HIGH);
+	
 	mp_spi->SetPinState(DAC_LATCH_CHANNEL, LOW);
 	asm volatile("NOP");
 	mp_spi->SetPinState(DAC_LATCH_CHANNEL, HIGH);

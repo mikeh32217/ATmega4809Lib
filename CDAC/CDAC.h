@@ -11,9 +11,6 @@
 
 #include "CSpi.h"
 
-#define DAC_CHANNEL			0
-#define DAC_LATCH_CHANNEL	1
-
 class CDAC
 {
 	private:
@@ -24,6 +21,7 @@ class CDAC
 		CDAC(CSpi* spi, float vref);
 		
 		void SetVoltage(float volts);
+		void Shutdown();
 };
 
 #endif /* CDAC_H_ */

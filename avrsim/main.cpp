@@ -20,19 +20,21 @@
 #define DEF_BUFFER_SZ	16
 
 void TestOneShot();
-void TestRepeatingPulse();
 void TestDAC();
 void TestMSI();
 void TestADC();
+void TestTimer();
+void TestPIO();
 
 DeviceManager dmgr;
 CUart uart(USART_BAUD_RATE(F_CPU, 9600), false);
-CTimer timer;
 
 CPulse* pulse = nullptr;
 CDAC* dac = nullptr;
 CUart* mspi = nullptr;
 CADC* adc = nullptr;
+CTimer* timer;
+CMCP23S17* pio = nullptr;
 
 int main(void)
 {
@@ -41,26 +43,42 @@ int main(void)
 	CCP = CCP_IOREG_gc;     // Key from table 10-1 section 10.3.5
 	CLKCTRL.MCLKCTRLB = 0;  // Main Clock Control B register section 10.5.2
 		
-	timer.StartTimer();
-	
 	uart.SendData(buf, strlen(buf));
 
 	// set ref for adc to avdd
 	//VREF.CTRLA |= VREF_AC0REFSEL_AVDD_gc;
 	
 //	TestOneShot();
-//	TestDAC();
+	TestDAC();
 //	TestADC();
-//	TestRepeatingPulse();
 //	TestMSI();
+//	TestTimer();
+//	TestPIO();
 	
-	volatile uint32_t t = 0;
     while (1) 
     {
-		t = timer.GetTicks();
-		_delay_ms(3000);
-		timer.StopTimer();
     }
+}
+
+void TestPIO()
+{
+	pio = dmgr.GetPIO();
+}
+
+void TestTimer()
+{
+	volatile uint32_t t = 0;
+	
+	timer = dmgr.GetTimer();
+	
+	timer->StartTimer();
+		
+	while (1)
+	{
+		t = timer->GetTicks();
+		_delay_ms(3000);
+		timer->StopTimer();
+	}
 }
 
 void TestMSI()
@@ -80,12 +98,13 @@ void TestADC()
 	volatile uint16_t res = 0;
 	
 	dac = dmgr.GetDAC(5.0f);
-	adc = new CADC();
+	adc = dmgr.GetADC();
+	adc->ConfigureChannel(0);
 	dac->SetVoltage(3.75f);
 
 	while(1)
 	{
-		res = adc->ReadADC();
+		res = adc->ReadADC(0);
 //		_delay_ms(100);
 	}	
 }
@@ -95,6 +114,8 @@ void TestDAC()
 	dac = dmgr.GetDAC(5.0f);
 	
 	dac->SetVoltage(3.25);
+	_delay_ms(3000);
+	dac->Shutdown();
 }
 
 void TestOneShot()
@@ -115,12 +136,5 @@ void TestOneShot()
 	}
 	
 	pulse->DisableOneShot();	
-}
-
-void TestRepeatingPulse()
-{
-	pulse->ConfigureRepeatingPulse(.001f, .0000128f);
-	_delay_ms(3000);
-	pulse->DisableRepeatingPulse();	
 }
 

@@ -22,6 +22,20 @@ void CPulse::ConfigureOneShot(float width, CS_STATE state /* = LOW */)
 	
 	ConfigureOneShot(w, state);
 }
+									
+void CPulse::SendPulse()
+{
+	EVSYS.STROBE = 0x01;
+}
+
+void CPulse::DisableOneShot()
+{
+	TCB0.CTRLB &= ~TCB_CCMPEN_bm;
+
+	// Disable timer
+	TCB0.CTRLA &= ~TCB_ENABLE_bm;
+}
+
 
 void CPulse::ConfigureOneShot(uint16_t width, CS_STATE state/* = LOW*/)
 {
@@ -44,52 +58,9 @@ void CPulse::ConfigureOneShot(uint16_t width, CS_STATE state/* = LOW*/)
 		TCB0.CTRLB = TCB_CCMPINIT_bm;
 }
 
-void CPulse::ConfigureRepeatingPulse(float period, 
-									float pwidth, 
-									CS_STATE state /* = LOW */)
-{
-	uint16_t p = (uint16_t)((float)F_CPU * period);
-	uint16_t w = (uint16_t)((float)F_CPU * pwidth);
-	
-	ConfigureRepeatingPulse(w + p, w, state);
-}
-									
-void CPulse::ConfigureRepeatingPulse(uint16_t period,
-									uint16_t pwidth,
-									CS_STATE state/* = LOW*/)
-{
-	ConfigureTimerA(period);
-	
-	// Route TCA Compare match Event Channel 0 to TCB0
-	EVSYS.CHANNEL0 = EVSYS_GENERATOR_TCA0_CMP0_gc;
 
-	ConfigureOneShot(pwidth, state);
-}
 
-void CPulse::ConfigureTimerA(uint16_t period)
-{
-	TCA0.SINGLE.CMP0BUF = period;
-	TCA0.SINGLE.CTRLB = TCA_SINGLE_WGMODE_FRQ_gc;
-	TCA0.SINGLE.CTRLA = TCA_SINGLE_ENABLE_bm;
-}
 
-void CPulse::SendPulse()
-{
-	EVSYS.STROBE = 0x01;
-}
 
-void CPulse::DisableOneShot()
-{
-	TCB0.CTRLB &= ~TCB_CCMPEN_bm;
 
-	// Disable timer
-	TCB0.CTRLA &= ~TCB_ENABLE_bm;
-}
-
-void CPulse::DisableRepeatingPulse()
-{
-	DisableOneShot();
-	
-	TCA0.SINGLE.CTRLA &= ~TCA_SINGLE_ENABLE_bm;
-}
 
