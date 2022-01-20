@@ -46,9 +46,11 @@ CMCP23S17::CMCP23S17(uint8_t addr, uint8_t ch, CSpi* spi)
 {
 	m_chan = ch;
 	mp_spi = spi;
+	
 	m_waddr = 0x40 | ((addr & 0x07) << 1);
 	m_raddr = 0x41 | ((addr & 0x07) << 1);
 
+	// Enable Slew rate and Hardware address
 	WriteReg(IOCONA, 0x18);
 
 	ReadAllRegs();
@@ -65,12 +67,10 @@ CMCP23S17::CMCP23S17(uint8_t addr, uint8_t ch, CSpi* spi)
  */
 void CMCP23S17::ConfigurePin(_PORTS port, _PINS pin, _DIR dir)
 {
-	uint16_t mask = (1 << pin);
+	uint8_t mask = (1 << pin);
 
 	if (port == EXP_PORTA)
 	{
-		m_regs[ACTIVEA] |= mask;
-
 		if (dir == EXT_OUTPUT)
 			m_regs[IODIRA] &= ~mask;
 		else
@@ -80,8 +80,6 @@ void CMCP23S17::ConfigurePin(_PORTS port, _PINS pin, _DIR dir)
 	}
 	else
 	{
-		m_regs[ACTIVEB] |= mask;
-
 		if (dir == EXT_OUTPUT)
 			m_regs[IODIRB] &= ~mask;
 		else
@@ -100,20 +98,19 @@ void CMCP23S17::ConfigurePin(_PORTS port, _PINS pin, _DIR dir)
  * 
  * \return void
  */
-void CMCP23S17::ConfigureByte(_PORTS port, uint8_t active_mask, uint8_t dir_mask)
+void CMCP23S17::ConfigurePort(_PORTS port, uint8_t dir_mask)
 {
-	uint8_t com = 0x01;
-
-	for (uint8_t i = 0; i < 8; i++)
+	if (port == EXP_PORTA)
 	{
-		if (active_mask & com)
-		{
-			if (dir_mask & com)
-				ConfigurePin(port, (_PINS)i, EXT_INPUT);
-			else
-				ConfigurePin(port, (_PINS)i, EXT_OUTPUT);
-		}
-		com >>= 1;
+		m_regs[IODIRA] = dir_mask;
+
+		WriteReg(IODIRA, m_regs[IODIRA]);
+	}
+	else
+	{
+		m_regs[IODIRB] = dir_mask;
+
+		WriteReg(IODIRB, m_regs[IODIRB]);
 	}
 }
 
@@ -135,7 +132,7 @@ void CMCP23S17::WritePin(_PORTS port, _PINS pin, _STATE val)
 		else
 			m_regs[GPIOA] &= ~(1 << pin);
 
-		WriteByte(port, m_regs[GPIOA], false);
+		WritePort(port, m_regs[GPIOA]);
 	}
 	else
 	{
@@ -144,7 +141,7 @@ void CMCP23S17::WritePin(_PORTS port, _PINS pin, _STATE val)
 		else
 			m_regs[GPIOB] &= ~(1 << pin);
 
-		WriteByte(port, m_regs[GPIOB], false);
+		WritePort(port, m_regs[GPIOB]);
 	}
 }
 
@@ -153,46 +150,26 @@ void CMCP23S17::WritePin(_PORTS port, _PINS pin, _STATE val)
  * 
  * \param port - PORTA or POSTB
  * \param val - Value to write
- * \param raw - raw = HIGH value is written out as it 
- *				raw = LOW the value is AND'd withe the active mask and only active bits designated
+ * \param raw - raw = HIGH value is written out as is 
+ *				raw = LOW the value is AND'd with the active mask and only active bits designated
  *					as output are output.
  * 
  * \return void
  */
-void CMCP23S17::WriteByte(_PORTS port, uint8_t val, bool raw)
+void CMCP23S17::WritePort(_PORTS port, uint8_t val)
 {
 	if (port == EXP_PORTA)
 	{
-		if (!raw)
-			val &= (m_regs[ACTIVEA] & ~m_regs[IODIRA]);
-
 		m_regs[GPIOA] = val;
 
-		WriteReg(GPIOA, val);
+		WriteReg(GPIOA, m_regs[GPIOA]);
 	}
 	else
 	{
-		if (!raw)
-			val &= (m_regs[ACTIVEB] & ~m_regs[IODIRB]);
-
 		m_regs[GPIOB] = val;
 
-		WriteReg(GPIOB, val);
+		WriteReg(GPIOB, m_regs[GPIOB]);
 	}
-}
-
-/**
- * \brief Write to both ports
- * 
- * \param dval - Value to write
- * \param raw - Write in raw more?
- * 
- * \return void
- */
-void CMCP23S17::WriteWord(uint16_t dval, bool raw)
-{
-	WriteByte(EXP_PORTA, dval & 0x00ff, raw);
-	WriteByte(EXP_PORTB, (dval & 0xff00) >> 8, raw);
 }
 
 /**
@@ -202,7 +179,7 @@ void CMCP23S17::WriteWord(uint16_t dval, bool raw)
  * 
  * \return uint8_t - Value read
  */
-uint8_t CMCP23S17::ReadByte(_PORTS port)
+uint8_t CMCP23S17::ReadPort(_PORTS port)
 {
 	if (port == EXP_PORTA)
 	{
@@ -264,14 +241,14 @@ void CMCP23S17::ConfigureInterrupt(_PORTS port, _PINS pin, _TRIGGER trig, _STATE
 		if (level)
 			m_regs[IOCONB] |= (1 << INTPOL);
 		else
-			m_regs[IOCONB] &= (1 << INTPOL);
+			m_regs[IOCONB] &= ~(1 << INTPOL);
 	}
 	else
 	{
 		if (level)
 			m_regs[IOCONA] |= (1 << INTPOL);
 		else
-			m_regs[IOCONA] &= (1 << INTPOL);
+			m_regs[IOCONA] &= ~(1 << INTPOL);
 	}
 
 	switch (trig)
@@ -285,7 +262,7 @@ void CMCP23S17::ConfigureInterrupt(_PORTS port, _PINS pin, _TRIGGER trig, _STATE
 			break;
 		case eFalling:
 			m_regs[intcon] |= (1 << pin);
-			m_regs[defval] |= ~(1 << pin);
+			m_regs[defval] |= (1 << pin);
 			break;
 	}
 

@@ -34,8 +34,6 @@
 
 #include "CSpi.h"
 
-#define MAX_CHANS	4
-
 #define ODR		0x02
 #define INTPOL	0x01
 
@@ -80,9 +78,7 @@ typedef enum
     GPIOA,      
 	GPIOB,
     OLATA, 
-	OLATB,
-	ACTIVEA,
-	ACTIVEB
+	OLATB
 } _REGS;
 
 typedef enum
@@ -104,12 +100,6 @@ typedef enum
 	eChange
 } _TRIGGER;
 
-typedef struct 
-{
-	_PORTS	s_port;
-	_PINS	s_pin;
-} ChanInfo;
-
 typedef union 
 {
 	uint32_t u_results;
@@ -128,34 +118,26 @@ class CMCP23S17 {
 		uint8_t		m_waddr;
 		uint8_t		m_regs[24];
 
-		// Spi related properties
-		_PORTS		m_spiPort;
-		_PINS		m_mosi;
-		_PINS		m_miso;
-		_PINS		m_clk;
-		ChanInfo	m_chanInfo[MAX_CHANNELS];
-
 	public:
 		CMCP23S17(uint8_t addr, uint8_t chan, CSpi* p_spi);
 
 		void ConfigurePin(_PORTS port, _PINS pin, _DIR dir);
-		void ConfigureByte(_PORTS port, uint8_t io_mask, uint8_t dir_mask);
+		void ConfigurePort(_PORTS port, uint8_t dir_mask);
 
 		void ConfigureInterrupt(_PORTS port, _PINS pin, _TRIGGER trig, _STATE level);
 		void SetInterruptState(_PORTS port, _PINS pin, bool state);
 		InterruptInfo GetInterruptResults();
 
 		void WritePin(_PORTS port, _PINS pin, _STATE val);
-		void WriteByte(_PORTS port, uint8_t val, bool raw = true);
-		void WriteWord(uint16_t dval, bool raw = true);
+		void WritePort(_PORTS port, uint8_t val);
 
 		void SetPullup(_PORTS port, _PINS pin, bool state);
 		void SetIntOD(_PORTS port, bool isOd);
 
-		uint8_t ReadByte(_PORTS port);
+		uint8_t ReadPort(_PORTS port);
 
-	private:
 		uint8_t ReadReg(uint8_t reg_addr);
+	private:
 		void WriteReg(uint8_t reg_addr, uint8_t op_code);
 
 		void ReadAllRegs();

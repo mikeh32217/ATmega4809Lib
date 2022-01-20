@@ -24,8 +24,11 @@ CDAC* DeviceManager::GetDAC(float vref)
 {
 	if (mp_dac == nullptr)
 	{
-		mp_spi = GetSpi();
-		mp_dac = new CDAC(mp_spi, vref);
+		mp_spi = GetSpi();			
+		mp_spi->ConfigureChannel(DAC_CHANNEL, &PORTA, PIN7_bm);
+		mp_spi->ConfigureChannel(DAC_LATCH_CHANNEL, &PORTA, PIN3_bm);
+
+		mp_dac = new CDAC(mp_spi, vref, DAC_CHANNEL, DAC_LATCH_CHANNEL);
 	}
 	
 	return mp_dac; 
@@ -60,7 +63,8 @@ CMCP23S17*DeviceManager::GetPIO()
 	if(mp_pio == nullptr)
 	{
 		mp_spi = GetSpi();
-		mp_spi->ConfigureChannel(PIO_CHANNEL, &PORTA, PIN1_bm);
+		mp_spi->ConfigureChannel(PIO_CHANNEL, &PORTD, PIN0_bm);
+		
 		mp_pio = new CMCP23S17(PIO_ADDRESS, PIO_CHANNEL, mp_spi);
 	}
 	

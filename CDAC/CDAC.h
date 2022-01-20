@@ -15,10 +15,12 @@ class CDAC
 {
 	private:
 		CSpi*	mp_spi;
+		uint8_t	m_dac_ch;
+		uint8_t m_latch;
 		float	m_vref;
 	
 	public:
-		CDAC(CSpi* spi, float vref);
+		CDAC(CSpi* spi, float vref, uint8_t dac_ch, uint8_t latch);
 		
 		void SetVoltage(float volts);
 		void Shutdown();

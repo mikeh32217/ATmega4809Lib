@@ -9,6 +9,7 @@
 #include <avr/io.h>
 #include <string.h>
 #include <util/delay.h>
+#include <avr/interrupt.h>
 #include "DeviceManager.h"
 #include "CUart.h"
 #include "CPulse.h"
@@ -36,6 +37,15 @@ CADC* adc = nullptr;
 CTimer* timer;
 CMCP23S17* pio = nullptr;
 
+volatile uint8_t g_res = 0;
+
+ISR(PORTD_PORT_vect)
+{
+	PORTD.INTFLAGS = PIN1_bm;
+	pio->ReadReg(INTCAPA);
+	g_res = pio->ReadPort(EXP_PORTA);
+}
+
 int main(void)
 {
 	char buf[] = "AVR Simulator 1.0\r\n";
@@ -49,11 +59,11 @@ int main(void)
 	//VREF.CTRLA |= VREF_AC0REFSEL_AVDD_gc;
 	
 //	TestOneShot();
-	TestDAC();
+//	TestDAC();
 //	TestADC();
 //	TestMSI();
 //	TestTimer();
-//	TestPIO();
+	TestPIO();
 	
     while (1) 
     {
@@ -63,6 +73,32 @@ int main(void)
 void TestPIO()
 {
 	pio = dmgr.GetPIO();
+	
+	pio->ConfigurePin(EXP_PORTA, ePIN0, EXT_OUTPUT);
+	pio->ConfigurePin(EXP_PORTA, ePIN1, EXT_INPUT);
+//	pio->ConfigurePort(EXP_PORTA, 0x02);
+	pio->SetPullup(EXP_PORTA, ePIN1, true);
+	pio->ConfigureInterrupt(EXP_PORTA, ePIN1, eFalling, eHIGH);
+	pio->SetInterruptState(EXP_PORTA, ePIN1, true);
+	
+	PORTD.DIRCLR = PIN1_bm;
+//	PORTD.DIRCLR = PIN2_bm;
+	PORTD.PIN1CTRL = PORT_ISC_RISING_gc;
+//	PORTD.PIN2CTRL = PORT_ISC_BOTHEDGES_gc;
+			
+	sei();
+
+	g_res = pio->ReadPort(EXP_PORTA);
+
+	while(1)
+	{
+//		pio->WritePin(EXP_PORTA, ePIN0, eHIGH);
+//		pio->WritePort(EXP_PORTA, 0x01);
+//		_delay_ms(100);
+//		pio->WritePin(EXP_PORTA, ePIN0, eLOW);
+//		pio->WritePort(EXP_PORTA, 0x00);
+//		_delay_ms(100);
+	}
 }
 
 void TestTimer()

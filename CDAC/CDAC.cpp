@@ -9,38 +9,38 @@
 #include "ErrorCodes.h"
 #include "CDAC.h"
 
-CDAC::CDAC(CSpi* spi, float vref)
+CDAC::CDAC(CSpi* spi, float vref, uint8_t dac_ch, uint8_t latch)
 {
 	mp_spi = spi;
 	m_vref = vref;
 	
-	mp_spi->ConfigureChannel(DAC_CHANNEL, &PORTA, PIN7_bm);
-	mp_spi->ConfigureChannel(DAC_LATCH_CHANNEL, &PORTA, PIN3_bm);
+	m_dac_ch = dac_ch;
+	m_latch = latch;
 }
 
 void CDAC::SetVoltage(float volts)
 {
 	uint16_t dout = (volts / m_vref) * 4096.0f;
 		
-	mp_spi->SetPinState(DAC_CHANNEL, LOW);
+	mp_spi->SetPinState(m_dac_ch, LOW);
 	mp_spi->TransferData((dout >> 8) | 0x70);
 	mp_spi->TransferData(dout & 0xff);
-	mp_spi->SetPinState(DAC_CHANNEL, HIGH);
+	mp_spi->SetPinState(m_dac_ch, HIGH);
 
-	mp_spi->SetPinState(DAC_LATCH_CHANNEL, LOW);
+	mp_spi->SetPinState(m_latch, LOW);
 	asm volatile("NOP");
-	mp_spi->SetPinState(DAC_LATCH_CHANNEL, HIGH);
+	mp_spi->SetPinState(m_latch, HIGH);
 }
 
 void CDAC::Shutdown()
 {
-	mp_spi->SetPinState(DAC_CHANNEL, LOW);
+	mp_spi->SetPinState(m_dac_ch, LOW);
 	mp_spi->TransferData(0x0);
 	mp_spi->TransferData(0x0);
-	mp_spi->SetPinState(DAC_CHANNEL, HIGH);
+	mp_spi->SetPinState(m_dac_ch, HIGH);
 	
-	mp_spi->SetPinState(DAC_LATCH_CHANNEL, LOW);
+	mp_spi->SetPinState(m_latch, LOW);
 	asm volatile("NOP");
-	mp_spi->SetPinState(DAC_LATCH_CHANNEL, HIGH);
+	mp_spi->SetPinState(m_latch, HIGH);
 }
 
