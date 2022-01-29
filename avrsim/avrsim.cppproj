@@ -156,6 +156,8 @@
       <Value>../../CADC</Value>
       <Value>../../CMCP23S17</Value>
       <Value>../../CTimer</Value>
+      <Value>../../CI2C</Value>
+      <Value>../../CRTC</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.level>Optimize debugging experience (-Og)</avrgcccpp.compiler.optimization.level>
@@ -174,6 +176,8 @@
       <Value>CADC</Value>
       <Value>CMCP23S17</Value>
       <Value>CTimer</Value>
+      <Value>CI2C</Value>
+      <Value>CRTC</Value>
     </ListValues>
   </avrgcccpp.linker.libraries.Libraries>
   <avrgcccpp.linker.libraries.LibrarySearchPaths>
@@ -185,6 +189,8 @@
       <Value>../../CADC/debug</Value>
       <Value>../../CMCP23S17/debug</Value>
       <Value>../../CTimer/debug</Value>
+      <Value>../../CI2C/debug</Value>
+      <Value>../../CRTC/debug</Value>
     </ListValues>
   </avrgcccpp.linker.libraries.LibrarySearchPaths>
   <avrgcccpp.assembler.general.IncludePaths>

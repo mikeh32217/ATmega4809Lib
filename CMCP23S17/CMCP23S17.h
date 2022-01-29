@@ -100,15 +100,6 @@ typedef enum
 	eChange
 } _TRIGGER;
 
-typedef union 
-{
-	uint32_t u_results;
-	uint8_t	s_portAPins;
-	uint8_t	s_portBPins;
-	uint8_t	s_portAValue;
-	uint8_t	s_portBValue;
-} InterruptInfo;
-
 class CMCP23S17 {
 	
 	private:
@@ -126,7 +117,6 @@ class CMCP23S17 {
 
 		void ConfigureInterrupt(_PORTS port, _PINS pin, _TRIGGER trig, _STATE level);
 		void SetInterruptState(_PORTS port, _PINS pin, bool state);
-		InterruptInfo GetInterruptResults();
 
 		void WritePin(_PORTS port, _PINS pin, _STATE val);
 		void WritePort(_PORTS port, uint8_t val);
@@ -136,8 +126,8 @@ class CMCP23S17 {
 
 		uint8_t ReadPort(_PORTS port);
 
-		uint8_t ReadReg(uint8_t reg_addr);
 	private:
+		uint8_t ReadReg(uint8_t reg_addr);
 		void WriteReg(uint8_t reg_addr, uint8_t op_code);
 
 		void ReadAllRegs();

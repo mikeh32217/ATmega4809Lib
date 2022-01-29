@@ -3,7 +3,11 @@
  *
  * Created: 12/30/2021 5:00:42 AM
  * Author : Mike
+ *
+ * TODO 
+ *	Add a dispose method or use destructor?
  */ 
+
 #define F_CPU 20000000UL
 
 #include <avr/io.h>
@@ -17,6 +21,8 @@
 #include "CADC.h"
 #include "CMCP23S17.h"
 #include "CTimer.h"
+#include "CI2C.h"
+#include "CRTC.h"
 
 #define DEF_BUFFER_SZ	16
 
@@ -26,6 +32,8 @@ void TestMSI();
 void TestADC();
 void TestTimer();
 void TestPIO();
+void TestI2C();
+void TestRTC();
 
 DeviceManager dmgr;
 CUart uart(USART_BAUD_RATE(F_CPU, 9600), false);
@@ -36,13 +44,14 @@ CUart* mspi = nullptr;
 CADC* adc = nullptr;
 CTimer* timer;
 CMCP23S17* pio = nullptr;
+CI2C* i2c = nullptr;
+CRTC* rtc = nullptr;
 
 volatile uint8_t g_res = 0;
 
 ISR(PORTD_PORT_vect)
 {
 	PORTD.INTFLAGS = PIN1_bm;
-	pio->ReadReg(INTCAPA);
 	g_res = pio->ReadPort(EXP_PORTA);
 }
 
@@ -63,18 +72,56 @@ int main(void)
 //	TestADC();
 //	TestMSI();
 //	TestTimer();
-	TestPIO();
+//	TestPIO();
+//	TestI2C();
+	TestRTC();
 	
     while (1) 
     {
     }
 }
 
+#define MEM_ADDR	0xA0
+
+void TestI2C()
+{
+	i2c = dmgr.GetI2C();
+	
+    while (1)
+    {
+		
+        //I2C_0_transmittingAddrPacket(I2C_SLAVE_ADDRESS, I2C_DIRECTION_BIT_READ);
+        i2c->Start(MEM_ADDR, I2C_DIRECTION_BIT_WRITE);
+		
+        //potentiometerUpperDataByte = I2C_0_receivingDataPacket();
+        //I2C_0_setACKAction();
+        //I2C_0_sendMasterCommand(TWI_MCMD_RECVTRANS_gc);
+        //
+        //potentiometerLowerDataByte = I2C_0_receivingDataPacket();
+        //I2C_0_setNACKAction();
+        //I2C_0_sendMasterCommand(TWI_MCMD_STOP_gc);
+        //
+        //
+        //potentiometer12BitValue =  CREATE_16BIT_VARIABLE(potentiometerUpperDataByte, potentiometerLowerDataByte);
+		//
+    }	
+}
+
+void TestRTC()
+{
+	rtc = dmgr.GetRTC();
+	
+	sei();
+	
+	rtc->Start();
+}
+
 void TestPIO()
 {
 	pio = dmgr.GetPIO();
 	
-	pio->ConfigurePin(EXP_PORTA, ePIN0, EXT_OUTPUT);
+//	pio->ConfigurePin(EXP_PORTA, ePIN0, EXT_OUTPUT);
+	// Sets A0 as input to test pin change interrupt on PIO
 	pio->ConfigurePin(EXP_PORTA, ePIN1, EXT_INPUT);
 //	pio->ConfigurePort(EXP_PORTA, 0x02);
 	pio->SetPullup(EXP_PORTA, ePIN1, true);
@@ -126,7 +173,6 @@ void TestMSI()
 		mspi->SendChar(0xa6);
 		PORTC.OUTSET = PIN3_bm;
 	}
-	
 }
 
 void TestADC()

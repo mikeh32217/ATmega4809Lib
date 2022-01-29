@@ -312,23 +312,6 @@ void CMCP23S17::SetInterruptState(_PORTS port, _PINS pin, bool state)
 }
 
 /**
- * \brief - Get interrupt pins and values
- * 
- * \return InterruptInfo - A union with all the pins and values.
- */
-InterruptInfo CMCP23S17::GetInterruptResults()
-{
-	InterruptInfo ui;
-
-	ui.s_portAPins = ReadReg(INTFA);
-	ui.s_portBPins = ReadReg(INTFB);
-	ui.s_portAValue = ReadReg(INTCAPA);
-	ui.s_portBValue = ReadReg(INTCAPB);
-
-	return ui;
-}
-
-/**
  * \brief - Set/Reset INT pin as Open Drain
  * 
  * \param port - Which port

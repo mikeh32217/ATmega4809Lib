@@ -18,6 +18,16 @@ DeviceManager::DeviceManager()
 	mp_pulse = nullptr;
 	mp_mspi = nullptr;
 	mp_timer = nullptr;
+	mp_i2c = nullptr;
+}
+
+CI2C* DeviceManager::GetI2C()
+{
+	if (mp_i2c == nullptr)
+		mp_i2c = new CI2C();
+	
+	return mp_i2c;
+	
 }
 
 CDAC* DeviceManager::GetDAC(float vref)
@@ -86,4 +96,14 @@ CTimer* DeviceManager::GetTimer()
 	
 	return mp_timer;
 }
+
+CRTC* DeviceManager::GetRTC()
+{
+	if (mp_rtc == nullptr)
+		mp_rtc = new CRTC();
+
+	return mp_rtc;
+}
+
+
 

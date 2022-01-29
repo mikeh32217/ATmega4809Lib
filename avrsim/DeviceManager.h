@@ -16,6 +16,8 @@
 #include "CUart.h"
 #include "CMCP23S17.h"
 #include "CTimer.h"
+#include "CI2C.h"
+#include "CRTC.h"
 
 class DeviceManager
 {
@@ -27,6 +29,8 @@ class DeviceManager
 		CUart*	mp_mspi;
 		CMCP23S17* mp_pio;
 		CTimer*	mp_timer;
+		CI2C*	mp_i2c;
+		CRTC*	mp_rtc;
 		
 	//functions
 	public:
@@ -36,8 +40,12 @@ class DeviceManager
 		CADC* GetADC();
 		CPulse* GetPulse();
 		CUart* GetMSpi(uint16_t buf_size = DEF_BUFFER_SZ);
-		CMCP23S17*GetPIO();
 		CTimer* GetTimer();
+		CI2C* GetI2C();
+		CRTC* GetRTC();
+		
+		CMCP23S17*GetPIO();
+		void PIO_AttachInterrupt();
 		
 	private:
 		CSpi* GetSpi();
