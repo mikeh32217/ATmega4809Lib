@@ -23,10 +23,10 @@ CTimer::CTimer()
 	m_callback = nullptr;
 	m_target = 0xffffffff;
 	
-	// Prescale F_CPU / 8
+	// Prescale F_CPU / 16
 	TCA0.SINGLE.CTRLA = TCA_SINGLE_CLKSEL_DIV16_gc;
 	
-	// FRQ mode
+	// NORMAL mode
 	TCA0.SINGLE.CTRLB = TCA_SINGLE_WGMODE_NORMAL_gc;
 	
 	// CMP0 interrupt enable

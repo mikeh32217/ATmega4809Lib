@@ -36,7 +36,7 @@ void TestI2C();
 void TestRTC();
 
 DeviceManager dmgr;
-CUart uart(USART_BAUD_RATE(F_CPU, 9600), false);
+//CUart uart(USART_BAUD_RATE(F_CPU, 9600), false);
 
 CPulse* pulse = nullptr;
 CDAC* dac = nullptr;
@@ -48,6 +48,7 @@ CI2C* i2c = nullptr;
 CRTC* rtc = nullptr;
 
 volatile uint8_t g_res = 0;
+volatile char buf1[4];
 
 ISR(PORTD_PORT_vect)
 {
@@ -62,7 +63,7 @@ int main(void)
 	CCP = CCP_IOREG_gc;     // Key from table 10-1 section 10.3.5
 	CLKCTRL.MCLKCTRLB = 0;  // Main Clock Control B register section 10.5.2
 		
-	uart.SendData(buf, strlen(buf));
+//	uart.SendData(buf, strlen(buf));
 
 	// set ref for adc to avdd
 	//VREF.CTRLA |= VREF_AC0REFSEL_AVDD_gc;
@@ -73,38 +74,38 @@ int main(void)
 //	TestMSI();
 //	TestTimer();
 //	TestPIO();
-//	TestI2C();
-	TestRTC();
+	TestI2C();
+//	TestRTC();
 	
     while (1) 
     {
     }
 }
 
-#define MEM_ADDR	0xA0
+#define CLIENT_ADDR	0xA6
 
 void TestI2C()
 {
-	i2c = dmgr.GetI2C();
+	volatile uint8_t outbuf[14] = { 0x00, 0x01, 'B', 'u', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'e', 'r', 's' };
+	volatile uint8_t inbuf[12];
 	
-    while (1)
-    {
+	i2c = dmgr.GetI2C();	
 		
-        //I2C_0_transmittingAddrPacket(I2C_SLAVE_ADDRESS, I2C_DIRECTION_BIT_READ);
-        i2c->Start(MEM_ADDR, I2C_DIRECTION_BIT_WRITE);
+    i2c->Start(CLIENT_ADDR, I2C_DIRECTION_BIT_WRITE);
+	i2c->SendData((uint8_t*)outbuf, 14);
+	i2c->Stop();
+	
+	_delay_ms(5);
+
+	i2c->Start(CLIENT_ADDR, I2C_DIRECTION_BIT_WRITE);
+	i2c->SendData((uint8_t*)outbuf, 2);
+	i2c->Stop();
 		
-        //potentiometerUpperDataByte = I2C_0_receivingDataPacket();
-        //I2C_0_setACKAction();
-        //I2C_0_sendMasterCommand(TWI_MCMD_RECVTRANS_gc);
-        //
-        //potentiometerLowerDataByte = I2C_0_receivingDataPacket();
-        //I2C_0_setNACKAction();
-        //I2C_0_sendMasterCommand(TWI_MCMD_STOP_gc);
-        //
-        //
-        //potentiometer12BitValue =  CREATE_16BIT_VARIABLE(potentiometerUpperDataByte, potentiometerLowerDataByte);
-		//
-    }	
+	_delay_ms(5);
+
+	i2c->Start(CLIENT_ADDR, I2C_DIRECTION_BIT_READ);
+	i2c->ReceiveData((uint8_t*)inbuf, 12);
+	i2c->Stop();
 }
 
 void TestRTC()
