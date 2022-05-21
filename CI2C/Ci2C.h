@@ -31,9 +31,7 @@
 #ifndef CI2C_H_
 #define CI2C_H_
 
-#define F_CPU                       20000000ul     // 20MHz default clock
-
-#define TWI0_BAUD(F_SCL, T_RISE)	(uint8_t)((((((float)F_CPU / (float)(F_SCL)) - 10 - (((float)(F_CPU) * (T_RISE))/1000000.0))) / 2))
+#define TWI0_BAUD(F_CLK, F_SCL, T_RISE)	(uint8_t)((((((float)F_CLK / (float)(F_SCL)) - 10 - (((float)(F_CLK) * (T_RISE))/1000000.0))) / 2))
 #define I2C_SCL_FREQ                  400000
 
 #define I2C_DIRECTION_BIT_WRITE       0
@@ -42,7 +40,7 @@
 class CI2C
 {
 	public:
-		CI2C();
+		CI2C(uint32_t clk);
 		
 		uint8_t Start(uint8_t addr, uint8_t directionBit);
 		uint8_t ReceiveData(uint8_t* data, uint8_t len);

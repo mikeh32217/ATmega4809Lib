@@ -14,6 +14,7 @@
 #include <string.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
+#include <string.h>
 #include "DeviceManager.h"
 #include "CUart.h"
 #include "CPulse.h"
@@ -34,6 +35,7 @@ void TestTimer();
 void TestPIO();
 void TestI2C();
 void TestRTC();
+void TestUART();
 
 DeviceManager dmgr;
 //CUart uart(USART_BAUD_RATE(F_CPU, 9600), false);
@@ -46,6 +48,7 @@ CTimer* timer;
 CMCP23S17* pio = nullptr;
 CI2C* i2c = nullptr;
 CRTC* rtc = nullptr;
+CUart* uart = nullptr;
 
 volatile uint8_t g_res = 0;
 volatile char buf1[4];
@@ -56,9 +59,10 @@ ISR(PORTD_PORT_vect)
 	g_res = pio->ReadPort(EXP_PORTA);
 }
 
+char wbuf[] = "AVR Simulator 1.0\r\n";
+
 int main(void)
 {
-	char buf[] = "AVR Simulator 1.0\r\n";
 	
 	CCP = CCP_IOREG_gc;     // Key from table 10-1 section 10.3.5
 	CLKCTRL.MCLKCTRLB = 0;  // Main Clock Control B register section 10.5.2
@@ -68,18 +72,35 @@ int main(void)
 	// set ref for adc to avdd
 	//VREF.CTRLA |= VREF_AC0REFSEL_AVDD_gc;
 	
-//	TestOneShot();
+	TestOneShot();
 //	TestDAC();
 //	TestADC();
 //	TestMSI();
 //	TestTimer();
 //	TestPIO();
-	TestI2C();
+//	TestI2C();
 //	TestRTC();
+//	TestUART();
 	
     while (1) 
     {
     }
+}
+
+void TestUART()
+{
+	// Set TX as output
+	PORTA.OUTSET = PIN0_bm;
+	
+	uart = dmgr.GetUart(F_CPU, 9600);
+	
+	uart->SendData(wbuf, strlen(wbuf));
+	
+	while (1)
+	{
+		uart->SendChar(0x30);
+		_delay_ms(500);
+	}
 }
 
 #define CLIENT_ADDR	0xA6
@@ -89,7 +110,7 @@ void TestI2C()
 	volatile uint8_t outbuf[14] = { 0x00, 0x01, 'B', 'u', 'g', 'g', 'g', 'g', 'g', 'g', 'g', 'e', 'r', 's' };
 	volatile uint8_t inbuf[12];
 	
-	i2c = dmgr.GetI2C();	
+	i2c = dmgr.GetI2C(F_CPU);	
 		
     i2c->Start(CLIENT_ADDR, I2C_DIRECTION_BIT_WRITE);
 	i2c->SendData((uint8_t*)outbuf, 14);
@@ -119,7 +140,7 @@ void TestRTC()
 
 void TestPIO()
 {
-	pio = dmgr.GetPIO();
+	pio = dmgr.GetPIO(F_CPU);
 	
 //	pio->ConfigurePin(EXP_PORTA, ePIN0, EXT_OUTPUT);
 	// Sets A0 as input to test pin change interrupt on PIO
@@ -153,7 +174,9 @@ void TestTimer()
 {
 	volatile uint32_t t = 0;
 	
-	timer = dmgr.GetTimer();
+	timer = dmgr.GetTimer(F_CPU);
+	
+	sei();
 	
 	timer->StartTimer();
 		
@@ -167,7 +190,7 @@ void TestTimer()
 
 void TestMSI()
 {
-	mspi = dmgr.GetMSpi();
+	mspi = dmgr.GetMSpi(F_CPU);
 	while (1)
 	{
 		PORTC.OUTCLR = PIN3_bm;
@@ -180,7 +203,7 @@ void TestADC()
 {
 	volatile uint16_t res = 0;
 	
-	dac = dmgr.GetDAC(5.0f);
+	dac = dmgr.GetDAC(F_CPU, 5.0f);
 	adc = dmgr.GetADC();
 	adc->ConfigureChannel(0);
 	dac->SetVoltage(3.75f);
@@ -194,7 +217,7 @@ void TestADC()
 
 void TestDAC()
 {
-	dac = dmgr.GetDAC(5.0f);
+	dac = dmgr.GetDAC(F_CPU, 5.0f);
 	
 	dac->SetVoltage(3.25);
 	_delay_ms(3000);
@@ -210,7 +233,7 @@ void TestOneShot()
 	// width is calculated as; F_CPU / WIDTH
 	// Example; 1ms = 20000000 * .001 = 0x4e20
 	// Example; 12.8uS = 20000000 * .00000128 = 0x100
-	pulse->ConfigureOneShot(.0000128f);
+	pulse->ConfigureOneShot(F_CPU, .0000128f);
 	
 	while(cnt++ < 0xffff)
 	{

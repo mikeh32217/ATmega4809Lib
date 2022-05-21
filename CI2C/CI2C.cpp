@@ -36,12 +36,12 @@
 #include <avr/io.h>
 #include "CI2C.h"
 
-CI2C::CI2C()
+CI2C::CI2C(uint32_t clk)
 {
 	TWI0.MCTRLA = TWI_WIEN_bm | TWI_ENABLE_bm;
 
     /* Host Baud Rate Control */
-    TWI0.MBAUD = TWI0_MBAUD = TWI0_BAUD((I2C_SCL_FREQ), 0.25);
+    TWI0.MBAUD = TWI0_MBAUD = TWI0_BAUD(clk, (I2C_SCL_FREQ), 0.25);
 	
     /* Set bus state idle */
     TWI0.MSTATUS = TWI_BUSSTATE_IDLE_gc;

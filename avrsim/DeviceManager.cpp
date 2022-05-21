@@ -1,11 +1,35 @@
-/* 
-* DeviceManager.cpp
-*
-* Created: 12/30/2021 5:14:26 AM
-* Author: Mike
-*/
-#define F_CPU 20000000UL
+ /*!
+	 \file DeviceManager.cpp
+	 \author Mike Hankey
+	 \date 12/30/2021
+ 
+	 \copyright
+	 Copyright (c) 2014 Mike Hankey <mikeh32217@yahoo.com>
 
+	 Permission is hereby granted, free of charge, to any person
+	 obtaining a copy of this software and associated documentation
+	 files (the "Software"), to deal in the Software without
+	 restriction, including without limitation the rights to use, copy,
+	 modify, merge, publish, distribute, sub license, and/or sell copies
+	 of the Software, and to permit persons to whom the Software is
+	 furnished to do so, subject to the following conditions:
+
+	 The above copyright notice and this permission notice shall be
+	 included in all copies or substantial portions of the Software.
+
+	 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+	 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+	 MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+	 NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+	 HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+	 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+	 DEALINGS IN THE SOFTWARE.
+	 
+	 \note Use the factory pattern to manage the various classes
+	 in this library.
+ */
+ 
 #include <avr/io.h>
 #include "ErrorCodes.h"
 #include "DeviceManager.h"
@@ -21,20 +45,19 @@ DeviceManager::DeviceManager()
 	mp_i2c = nullptr;
 }
 
-CI2C* DeviceManager::GetI2C()
+CI2C* DeviceManager::GetI2C(uint32_t clk)
 {
 	if (mp_i2c == nullptr)
-		mp_i2c = new CI2C();
+		mp_i2c = new CI2C(clk);
 	
 	return mp_i2c;
-	
 }
 
-CDAC* DeviceManager::GetDAC(float vref)
+CDAC* DeviceManager::GetDAC(uint32_t clk, float vref)
 {
 	if (mp_dac == nullptr)
 	{
-		mp_spi = GetSpi();			
+		mp_spi = GetSpi(clk, 2);			
 		mp_spi->ConfigureChannel(DAC_CHANNEL, &PORTA, PIN7_bm);
 		mp_spi->ConfigureChannel(DAC_LATCH_CHANNEL, &PORTA, PIN3_bm);
 
@@ -60,19 +83,11 @@ CPulse* DeviceManager::GetPulse()
 	return mp_pulse; 
 }
 
-CUart* DeviceManager::GetMSpi(uint16_t buf_size/* = DEF_BUFFER_SZ*/)
-{
-	if (mp_mspi == nullptr)
-		mp_mspi = new CUart(USART_BAUD_RATE(F_CPU, 9600), true, buf_size);
-		
-	return mp_mspi;
-}
-
-CMCP23S17*DeviceManager::GetPIO()
+CMCP23S17*DeviceManager::GetPIO(uint32_t clk)
 {
 	if(mp_pio == nullptr)
 	{
-		mp_spi = GetSpi();
+		mp_spi = GetSpi(clk, 2);
 		mp_spi->ConfigureChannel(PIO_CHANNEL, &PORTD, PIN0_bm);
 		
 		mp_pio = new CMCP23S17(PIO_ADDRESS, PIO_CHANNEL, mp_spi);
@@ -81,18 +96,18 @@ CMCP23S17*DeviceManager::GetPIO()
 	return mp_pio;
 }
 
-CSpi* DeviceManager::GetSpi()
+CSpi* DeviceManager::GetSpi(uint32_t clk, uint8_t timeout_ms)
 {
 	if(mp_spi== nullptr)
-		mp_spi = new CSpi();
+		mp_spi = new CSpi(clk, timeout_ms);
 	
 	return mp_spi;
 }
 
-CTimer* DeviceManager::GetTimer()
+CTimer* DeviceManager::GetTimer(uint32_t clk)
 {
 	if(mp_timer == nullptr)
-		mp_timer = new CTimer();
+		mp_timer = new CTimer(clk);
 	
 	return mp_timer;
 }
@@ -103,6 +118,22 @@ CRTC* DeviceManager::GetRTC()
 		mp_rtc = new CRTC();
 
 	return mp_rtc;
+}
+
+CUart* DeviceManager::GetMSpi(uint32_t clk, uint16_t buf_size/* = DEF_BUFFER_SZ*/)
+{
+	if (mp_mspi == nullptr)
+		mp_mspi = new CUart(USART_BAUD_RATE(clk, 9600), true, buf_size);
+	
+	return mp_mspi;
+}
+
+CUart* DeviceManager::GetUart(uint32_t clk, uint32_t baud, uint16_t buf_size/* = DEF_BUFFER_SZ*/)
+{
+	if (mp_mspi == nullptr)
+		mp_mspi = new CUart(USART_BAUD_RATE(clk, baud), false, buf_size);
+	
+	return mp_mspi;
 }
 
 
