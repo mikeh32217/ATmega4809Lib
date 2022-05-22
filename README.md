@@ -1,5 +1,6 @@
 # ATmega4809Lib
-A library of classes that highlight the functionality of the ATmeg4809
+A library of classes that highlight the functionality of the ATmeg4809.
+
 After working with the ATmega4809 off and on for a few months now I'm finding that it's pretty easy to work
 with, once you learn the ins and outs and actually read the data sheet. The problem that I've been running into
 is that because it is such a new chip there is very little example code or tutorials relating to it.
