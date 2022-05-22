@@ -142,31 +142,27 @@ void TestPIO()
 {
 	pio = dmgr.GetPIO(F_CPU);
 	
-//	pio->ConfigurePin(EXP_PORTA, ePIN0, EXT_OUTPUT);
-	// Sets A0 as input to test pin change interrupt on PIO
+	// Set Extender PORTA.PIN0 as output for blink
+	pio->ConfigurePin(EXP_PORTA, ePIN0, EXT_OUTPUT);
+	
+	// Sets A1 as input to test pin change interrupt on PIO
 	pio->ConfigurePin(EXP_PORTA, ePIN1, EXT_INPUT);
-//	pio->ConfigurePort(EXP_PORTA, 0x02);
 	pio->SetPullup(EXP_PORTA, ePIN1, true);
 	pio->ConfigureInterrupt(EXP_PORTA, ePIN1, eFalling, eHIGH);
 	pio->SetInterruptState(EXP_PORTA, ePIN1, true);
 	
+	// Set PORTD.PIN1 interrupt on rising edge
 	PORTD.DIRCLR = PIN1_bm;
-//	PORTD.DIRCLR = PIN2_bm;
 	PORTD.PIN1CTRL = PORT_ISC_RISING_gc;
-//	PORTD.PIN2CTRL = PORT_ISC_BOTHEDGES_gc;
 			
 	sei();
 
-	g_res = pio->ReadPort(EXP_PORTA);
-
 	while(1)
 	{
-//		pio->WritePin(EXP_PORTA, ePIN0, eHIGH);
-//		pio->WritePort(EXP_PORTA, 0x01);
-//		_delay_ms(100);
-//		pio->WritePin(EXP_PORTA, ePIN0, eLOW);
-//		pio->WritePort(EXP_PORTA, 0x00);
-//		_delay_ms(100);
+		pio->WritePin(EXP_PORTA, ePIN0, eHIGH);
+		_delay_ms(100);
+		pio->WritePin(EXP_PORTA, ePIN0, eLOW);
+		_delay_ms(100);
 	}
 }
 
@@ -231,7 +227,6 @@ void TestOneShot()
 	pulse = dmgr.GetPulse();
 	
 	// width is calculated as; F_CPU / WIDTH
-	// Example; 1ms = 20000000 * .001 = 0x4e20
 	// Example; 12.8uS = 20000000 * .00000128 = 0x100
 	pulse->ConfigureOneShot(F_CPU, .0000128f);
 	
